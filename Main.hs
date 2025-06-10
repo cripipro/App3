@@ -95,7 +95,7 @@ main = do
         (Just forest, Just initE) ->
           let rows = length forest
               cols = case forest of
-                       (row:) -> length row
+                       (row:_) -> length row
                        []      -> 0
               start = (0,0)
 
@@ -115,6 +115,5 @@ main = do
               endTime <- getCurrentTime
               putStrLn $ "Tiempo de ejecución: " ++ show (diffUTCTime endTime startTime)
 
-         -> putStrLn "Error: no pude parsear la matriz o la energía. Ejemplo de uso:\n  App3 "[[2,-3,1,0],[4,0,-2,3]]" 12"
-
-    _ -> putStrLn "Uso: App3 <matriz> <energiaInicial>\nEjemplo:\n  App3 "[[2,-3,1,0,2,3],[-5,4,-2,1,0,-4],[1,3,0,-3,2,2],[2,-1,4,0,-5,1],[0,2,-3,3,4,-1],[1,0,2,-2,1,5]]" 12"
+      _ -> putStrLn "Error: no pude parsear la matriz o la energía. Ejemplo de uso:\n  App3 \"[[2,-3,1,0],[4,0,-2,3]]\" 12"
+    _ -> putStrLn "Uso: App3 <matriz> <energiaInicial>\nEjemplo:\n  App3 \"[[2,-3,1,0,2,3],[-5,4,-2,1,0,-4],[1,3,0,-3,2,2],[2,-1,4,0,-5,1],[0,2,-3,3,4,-1],[1,0,2,-2,1,5]]\" 12"
