@@ -54,3 +54,31 @@ go forest rows cols pos@(r,c) e visited path
       , let e' = stepEnergy e cost runeVal
       , e' >= 0
       ]
+goOpt
+  :: [[Int]]
+  -> Int
+  -> Int
+  -> Coord
+  -> Energy
+  -> Set Coord
+  -> [Coord]
+  -> Map Coord Energy
+  -> [([Coord],Energy)]
+goOpt forest rows cols pos@(r,c) e visited path bestMap
+  | pos == (rows-1, cols-1) = [(path, e)]
+  | otherwise = concat
+      [ goOpt forest rows cols newPos e' (Set.insert newPos visited) (path ++ [newPos]) bestMap'
+      | (dr,dc,cost) <- moves
+      , let newPos@(r',c') = (r+dr, c+dc)
+      , r' >= 0, r' < rows
+      , c' >= 0, c' < cols
+      , not (Set.member newPos visited)
+      , let runeVal = (forest !! r') !! c'
+      , let e' = stepEnergy e cost runeVal
+      , e' >= 0
+      , let better = case Map.lookup newPos bestMap of
+                        Nothing -> True
+                        Just prevE -> e' > prevE
+      , let bestMap' = if better then Map.insert newPos e' bestMap else bestMap
+      , better
+      ]
