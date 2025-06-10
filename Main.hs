@@ -82,3 +82,39 @@ goOpt forest rows cols pos@(r,c) e visited path bestMap
       , let bestMap' = if better then Map.insert newPos e' bestMap else bestMap
       , better
       ]
+main :: IO ()
+main = do
+  startTime <- getCurrentTime
+  args <- getArgs
+  case args of
+
+    [matrixStr, energyStr] ->
+      case ( readMaybe matrixStr :: Maybe [[Int]]
+           , readMaybe energyStr :: Maybe Int
+           ) of
+        (Just forest, Just initE) ->
+          let rows = length forest
+              cols = case forest of
+                       (row:) -> length row
+                       []      -> 0
+              start = (0,0)
+
+              initialRune = (forest !! 0) !! 0
+              e0 = stepEnergy initE 0 initialRune
+          in
+          if e0 < 0
+            then putStrLn "No hay camino válido: energía inicial insuficiente en la casilla inicial"
+            else do
+              let paths = goOpt forest rows cols start e0 (Set.singleton start) [start] Map.empty
+              if null paths
+                then putStrLn "No existe ningún camino válido que llegue al destino sin agotar la energía."
+                else do
+                  let (bestPath, bestE) = maximumBy (comparing snd) paths
+                  putStrLn $ "Mejor camino: " ++ show bestPath
+                  putStrLn $ "Energía final: " ++ show bestE
+              endTime <- getCurrentTime
+              putStrLn $ "Tiempo de ejecución: " ++ show (diffUTCTime endTime startTime)
+
+         -> putStrLn "Error: no pude parsear la matriz o la energía. Ejemplo de uso:\n  App3 "[[2,-3,1,0],[4,0,-2,3]]" 12"
+
+    _ -> putStrLn "Uso: App3 <matriz> <energiaInicial>\nEjemplo:\n  App3 "[[2,-3,1,0,2,3],[-5,4,-2,1,0,-4],[1,3,0,-3,2,2],[2,-1,4,0,-5,1],[0,2,-3,3,4,-1],[1,0,2,-2,1,5]]" 12"
